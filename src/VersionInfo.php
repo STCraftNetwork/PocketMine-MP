@@ -30,8 +30,8 @@ use function is_int;
 use function str_repeat;
 
 final class VersionInfo{
-	public const NAME = "PocketMine-MP";
-	public const BASE_VERSION = "5.19.1";
+	public const NAME = "STCraftNetwork";
+	public const BASE_VERSION = "5.20.0";
 	public const IS_DEVELOPMENT_BUILD = true;
 	public const BUILD_CHANNEL = "stable";
 
