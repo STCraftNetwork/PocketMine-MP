@@ -35,9 +35,11 @@ use pocketmine\world\generator\Generator;
 use pocketmine\world\generator\InvalidGeneratorOptionsException;
 use pocketmine\world\generator\noise\Simplex;
 use pocketmine\world\generator\object\OreType;
+use pocketmine\world\generator\populator\Cave;
 use pocketmine\world\generator\populator\GroundCover;
 use pocketmine\world\generator\populator\Ore;
 use pocketmine\world\generator\populator\Populator;
+use pocketmine\world\generator\populator\Tree;
 use pocketmine\world\World;
 
 class Normal extends Generator{
@@ -46,59 +48,34 @@ class Normal extends Generator{
 	private const WORLD_MAX_HEIGHT = 320;
 	private const DEEPSLATE_START = 0;
 	private int $waterHeight = 62;
-	/** @var Populator[] */
 	private array $populators = [];
-	/** @var Populator[] */
 	private array $generationPopulators = [];
 	private Simplex $noiseBase;
 	private BiomeSelector $selector;
 	private Gaussian $gaussian;
 
-	public function __construct(int $seed, string $preset){
+	public function __construct(int $seed, string $preset) {
 		parent::__construct($seed, $preset);
 		$this->gaussian = new Gaussian(2);
 		$this->noiseBase = new Simplex($this->random, 4, 1 / 4, 1 / 32);
 		$this->random->setSeed($this->seed);
-		$this->selector = new class($this->random) extends BiomeSelector{
-			protected function lookup(float $temperature, float $rainfall) : int{
-				if($rainfall < 0.25){
-					if($temperature < 0.7){
-						return BiomeIds::OCEAN;
-					}elseif($temperature < 0.85){
-						return BiomeIds::RIVER;
-					}else{
-						return BiomeIds::SWAMPLAND;
-					}
-				}elseif($rainfall < 0.60){
-					if($temperature < 0.25){
-						return BiomeIds::ICE_PLAINS;
-					}elseif($temperature < 0.75){
-						return BiomeIds::PLAINS;
-					}else{
-						return BiomeIds::DESERT;
-					}
-				}elseif($rainfall < 0.80){
-					if($temperature < 0.25){
-						return BiomeIds::TAIGA;
-					}elseif($temperature < 0.75){
-						return BiomeIds::FOREST;
-					}else{
-						return BiomeIds::BIRCH_FOREST;
-					}
-				}else{
-					if($temperature < 0.20){
-						return BiomeIds::EXTREME_HILLS;
-					}elseif($temperature < 0.40){
-						return BiomeIds::EXTREME_HILLS_EDGE;
-					}else{
-						return BiomeIds::RIVER;
-					}
+		$this->selector = new class($this->random) extends BiomeSelector {
+			protected function lookup(float $temperature, float $rainfall): int {
+				if ($rainfall < 0.25) {
+					return $temperature < 0.7 ? BiomeIds::OCEAN : BiomeIds::DESERT;
+				} elseif ($rainfall < 0.60) {
+					return $temperature < 0.75 ? BiomeIds::PLAINS : BiomeIds::DESERT;
+				} elseif ($rainfall < 0.80) {
+					return $temperature < 0.75 ? BiomeIds::FOREST : BiomeIds::BIRCH_FOREST;
+				} else {
+					return BiomeIds::RIVER;
 				}
 			}
 		};
 		$this->selector->recalculate();
 		$cover = new GroundCover();
 		$this->generationPopulators[] = $cover;
+
 		$ores = new Ore();
 		$stone = VanillaBlocks::STONE();
 		$ores->setOreTypes([
@@ -112,26 +89,48 @@ class Normal extends Generator{
 			new OreType(VanillaBlocks::GRAVEL(), $stone, 10, 16, 0, 128)
 		]);
 		$this->populators[] = $ores;
+
+		$this->addTreePopulators();
+		$this->addCavePopulators();
 	}
 
-	private function pickBiome(int $x, int $z) : Biome{
+	private function addTreePopulators(): void {
+		$trees = new Tree();
+		$trees->setBaseAmount(1);
+		$trees->setRandomAmount(3);
+
+		$this->populators[] = $trees;
+	}
+
+	private function addCavePopulators(): void {
+		$caves = new Cave();
+		$caves->setDensity(0.1);
+		$caves->setTunnelingFactor(2);
+		$this->populators[] = $caves;
+	}
+
+	private function pickBiome(int $x, int $z): Biome {
 		$hash = $x * 2345803 ^ $z * 9236449 ^ $this->seed;
 		$hash *= $hash + 223;
 		$hash = (int) $hash;
 		$xNoise = $hash >> 20 & 3;
 		$zNoise = $hash >> 22 & 3;
-		if($xNoise == 3){
-			$xNoise = 1;
-		}
-		if($zNoise == 3){
-			$zNoise = 1;
-		}
+		$xNoise = $xNoise === 3 ? 1 : $xNoise;
+		$zNoise = $zNoise === 3 ? 1 : $zNoise;
 		return $this->selector->pickBiome($x + $xNoise - 1, $z + $zNoise - 1);
 	}
 
-	public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void{
+	public function generateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
 		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->seed);
-		$noise = $this->noiseBase->getFastNoise3D(Chunk::EDGE_LENGTH, self::WORLD_MAX_HEIGHT - self::WORLD_MIN_HEIGHT, Chunk::EDGE_LENGTH, 4, 8, 4, $chunkX * Chunk::EDGE_LENGTH, self::WORLD_MIN_HEIGHT, $chunkZ * Chunk::EDGE_LENGTH);
+		$noise = $this->noiseBase->getFastNoise3D(
+			Chunk::EDGE_LENGTH,
+			self::WORLD_MAX_HEIGHT - self::WORLD_MIN_HEIGHT,
+			Chunk::EDGE_LENGTH,
+			4, 8, 4,
+			$chunkX * Chunk::EDGE_LENGTH,
+			self::WORLD_MIN_HEIGHT,
+			$chunkZ * Chunk::EDGE_LENGTH
+		);
 		$chunk = $world->getChunk($chunkX, $chunkZ) ?? throw new \InvalidArgumentException("Chunk $chunkX $chunkZ does not yet exist");
 		$biomeCache = [];
 		$bedrock = VanillaBlocks::BEDROCK()->getStateId();
@@ -141,29 +140,27 @@ class Normal extends Generator{
 		$baseX = $chunkX * Chunk::EDGE_LENGTH;
 		$baseZ = $chunkZ * Chunk::EDGE_LENGTH;
 
-		for($x = 0; $x < Chunk::EDGE_LENGTH; ++$x){
+		for ($x = 0; $x < Chunk::EDGE_LENGTH; ++$x) {
 			$absoluteX = $baseX + $x;
-			for($z = 0; $z < Chunk::EDGE_LENGTH; ++$z){
+			for ($z = 0; $z < Chunk::EDGE_LENGTH; ++$z) {
 				$absoluteZ = $baseZ + $z;
 				$biome = $this->pickBiome($absoluteX, $absoluteZ);
-				for($y = self::WORLD_MIN_HEIGHT; $y < self::WORLD_MAX_HEIGHT; $y++){
+
+				for ($y = self::WORLD_MIN_HEIGHT; $y < self::WORLD_MAX_HEIGHT; $y++) {
 					$chunk->setBiomeId($x, $y, $z, $biome->getId());
 				}
+
 				$minSum = 0;
 				$maxSum = 0;
 				$weightSum = 0;
-				for($sx = -$this->gaussian->smoothSize; $sx <= $this->gaussian->smoothSize; ++$sx){
-					for($sz = -$this->gaussian->smoothSize; $sz <= $this->gaussian->smoothSize; ++$sz){
+				for ($sx = -$this->gaussian->smoothSize; $sx <= $this->gaussian->smoothSize; ++$sx) {
+					for ($sz = -$this->gaussian->smoothSize; $sz <= $this->gaussian->smoothSize; ++$sz) {
 						$weight = $this->gaussian->kernel[$sx + $this->gaussian->smoothSize][$sz + $this->gaussian->smoothSize];
-						if($sx === 0 && $sz === 0){
+						if ($sx === 0 && $sz === 0) {
 							$adjacent = $biome;
-						}else{
+						} else {
 							$index = World::chunkHash($absoluteX + $sx, $absoluteZ + $sz);
-							if(isset($biomeCache[$index])){
-								$adjacent = $biomeCache[$index];
-							}else{
-								$biomeCache[$index] = $adjacent = $this->pickBiome($absoluteX + $sx, $absoluteZ + $sz);
-							}
+							$adjacent = $biomeCache[$index] ??= $this->pickBiome($absoluteX + $sx, $absoluteZ + $sz);
 						}
 						$minSum += ($adjacent->getMinElevation() - 1) * $weight;
 						$maxSum += $adjacent->getMaxElevation() * $weight;
@@ -174,18 +171,14 @@ class Normal extends Generator{
 				$maxSum /= $weightSum;
 				$smoothHeight = ($maxSum - $minSum) / 2;
 
-				for($y = self::WORLD_MIN_HEIGHT; $y < self::WORLD_MAX_HEIGHT; ++$y){
-					if($y === self::WORLD_MIN_HEIGHT){
+				for ($y = self::WORLD_MIN_HEIGHT; $y < self::WORLD_MAX_HEIGHT; ++$y) {
+					if ($y === self::WORLD_MIN_HEIGHT) {
 						$chunk->setBlockStateId($x, $y, $z, $bedrock);
-					}else{
+					} else {
 						$noiseValue = $noise[$x][$z][$y - self::WORLD_MIN_HEIGHT] - 1 / $smoothHeight * ($y - $smoothHeight - $minSum);
-						if($noiseValue > 0){
-							if($y < self::DEEPSLATE_START){
-								$chunk->setBlockStateId($x, $y, $z, $deepslate);
-							}else{
-								$chunk->setBlockStateId($x, $y, $z, $stone);
-							}
-						}elseif($y <= $this->waterHeight){
+						if ($noiseValue > 0) {
+							$chunk->setBlockStateId($x, $y, $z, $y < self::DEEPSLATE_START ? $deepslate : $stone);
+						} elseif ($y <= $this->waterHeight) {
 							$chunk->setBlockStateId($x, $y, $z, $stillWater);
 						}
 					}
@@ -193,13 +186,13 @@ class Normal extends Generator{
 			}
 		}
 
-		foreach($this->generationPopulators as $populator){
+		foreach ($this->generationPopulators as $populator) {
 			$populator->populate($world, $chunkX, $chunkZ, $this->random);
 		}
 	}
 
-	public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ) : void{
-		foreach($this->populators as $populator){
+	public function populateChunk(ChunkManager $world, int $chunkX, int $chunkZ): void {
+		foreach ($this->populators as $populator) {
 			$populator->populate($world, $chunkX, $chunkZ, $this->random);
 		}
 	}
