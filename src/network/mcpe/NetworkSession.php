@@ -1107,15 +1107,10 @@ class NetworkSession{
 
 			$description = $command->getDescription();
 			$overloads = [];
-			$parameter = [];
 			foreach($command->getArguments() as $arg) {
-    			$parameter = new CommandParameter(
-        		$arg['name'],
-        		$arg['type'] ?? AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
-        		$arg['optional'] ?? 0 
-    		);
-    
-    		$overloads[] = new CommandOverload(
+				$parameter = CommandParameter::standard($arg['name'], $arg['type'] ?? AvailableCommandsPacket::ARG_TYPE_RAWTEXT, 0, $arg['optional'] ?? true);
+
+				$overloads[] = new CommandOverload(
         		chaining: false, 
         		parameters: [$parameter] 
     		);
