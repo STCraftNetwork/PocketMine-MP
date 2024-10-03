@@ -30,6 +30,7 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\StringToEnchantmentParser;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class EnchantCommand extends VanillaCommand{
@@ -44,6 +45,9 @@ class EnchantCommand extends VanillaCommand{
 			DefaultPermissionNames::COMMAND_ENCHANT_SELF,
 			DefaultPermissionNames::COMMAND_ENCHANT_OTHER
 		]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
+		$this->setArgument("effect", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
+		$this->setArgument("number", AvailableCommandsPacket::ARG_TYPE_INT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

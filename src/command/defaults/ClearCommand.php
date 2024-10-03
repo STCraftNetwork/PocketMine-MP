@@ -34,6 +34,7 @@ use pocketmine\item\StringToItemParser;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 use function min;
 
@@ -46,6 +47,7 @@ class ClearCommand extends VanillaCommand{
 			KnownTranslationFactory::pocketmine_command_clear_usage()
 		);
 		$this->setPermissions([DefaultPermissionNames::COMMAND_CLEAR_SELF, DefaultPermissionNames::COMMAND_CLEAR_OTHER]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

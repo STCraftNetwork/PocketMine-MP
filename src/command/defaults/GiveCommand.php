@@ -35,6 +35,7 @@ use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\NbtException;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function array_slice;
 use function count;
 use function implode;
@@ -51,6 +52,9 @@ class GiveCommand extends VanillaCommand{
 			DefaultPermissionNames::COMMAND_GIVE_SELF,
 			DefaultPermissionNames::COMMAND_GIVE_OTHER
 		]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
+		$this->setArgument("item", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, false);
+		$this->setArgument("count", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

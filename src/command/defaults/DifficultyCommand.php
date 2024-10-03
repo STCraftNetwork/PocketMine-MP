@@ -30,6 +30,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\ServerProperties;
 use pocketmine\world\World;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class DifficultyCommand extends VanillaCommand{
@@ -41,6 +42,7 @@ class DifficultyCommand extends VanillaCommand{
 			KnownTranslationFactory::commands_difficulty_usage()
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_DIFFICULTY);
+		$this->setArgument("difficulty", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, false);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

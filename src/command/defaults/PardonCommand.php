@@ -28,6 +28,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class PardonCommand extends VanillaCommand{
@@ -40,6 +41,7 @@ class PardonCommand extends VanillaCommand{
 			["unban"]
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_UNBAN_PLAYER);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

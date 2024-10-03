@@ -29,6 +29,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 use function implode;
 
@@ -41,6 +42,7 @@ class MeCommand extends VanillaCommand{
 			KnownTranslationFactory::commands_me_usage()
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_ME);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

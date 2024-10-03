@@ -30,6 +30,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function array_shift;
 use function count;
 
@@ -42,6 +43,7 @@ class DeopCommand extends VanillaCommand{
 			KnownTranslationFactory::commands_deop_usage()
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_OP_TAKE);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

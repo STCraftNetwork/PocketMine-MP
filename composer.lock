@@ -208,12 +208,12 @@
             "version": "34.0.0+bedrock-1.21.30",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pmmp/BedrockProtocol.git",
+                "url": "https://github.com/STCraftNetwork/BedrockProtocol.git",
                 "reference": "440c8078c66cc2a8f2abf58468df7df7246ee33b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/440c8078c66cc2a8f2abf58468df7df7246ee33b",
+                "url": "https://api.github.com/repos/STCraftNetwork/BedrockProtocol/zipball/440c8078c66cc2a8f2abf58468df7df7246ee33b",
                 "reference": "440c8078c66cc2a8f2abf58468df7df7246ee33b",
                 "shasum": ""
             },

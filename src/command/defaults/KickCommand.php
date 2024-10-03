@@ -30,6 +30,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function array_shift;
 use function count;
 use function implode;
@@ -44,6 +45,8 @@ class KickCommand extends VanillaCommand{
 			KnownTranslationFactory::commands_kick_usage()
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_KICK);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
+        $this->setArgument("reason", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

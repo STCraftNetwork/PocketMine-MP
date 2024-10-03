@@ -29,6 +29,7 @@ use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class KillCommand extends VanillaCommand{
@@ -41,6 +42,7 @@ class KillCommand extends VanillaCommand{
 			["suicide"]
 		);
 		$this->setPermissions([DefaultPermissionNames::COMMAND_KILL_SELF, DefaultPermissionNames::COMMAND_KILL_OTHER]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

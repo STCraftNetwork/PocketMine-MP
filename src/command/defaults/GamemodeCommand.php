@@ -29,6 +29,7 @@ use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\GameMode;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class GamemodeCommand extends VanillaCommand{
@@ -43,6 +44,8 @@ class GamemodeCommand extends VanillaCommand{
 			DefaultPermissionNames::COMMAND_GAMEMODE_SELF,
 			DefaultPermissionNames::COMMAND_GAMEMODE_OTHER
 		]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_TARGET, false);
+		$this->setArgument("gamemode", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

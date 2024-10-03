@@ -47,6 +47,11 @@ abstract class Command{
 	/** @var string[] */
 	private array $aliases = [];
 
+	/**
+     * @var array<string, mixed> $arguments
+     */
+    protected array $arguments = [];
+
 	/** @var string[] */
 	private array $activeAliases = [];
 
@@ -220,6 +225,18 @@ abstract class Command{
 	public function setUsage(Translatable|string $usage) : void{
 		$this->usageMessage = $usage;
 	}
+
+	public function getArguments() {
+		return $this->arguments;
+	}
+
+    public function setArgument(string $name, int $type = AvailableCommandsPacket::ARG_TYPE_RAWTEXT, bool $optional = false): void {
+        $this->arguments[] = [
+            'name' => $name,
+            'type' => $type,
+            'optional' => $optional
+        ];
+    }
 
 	public static function broadcastCommandMessage(CommandSender $source, Translatable|string $message, bool $sendToSource = true) : void{
 		$users = $source->getServer()->getBroadcastChannelSubscribers(Server::BROADCAST_CHANNEL_ADMINISTRATIVE);

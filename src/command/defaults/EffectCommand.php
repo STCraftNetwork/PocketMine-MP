@@ -31,6 +31,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\utils\Limits;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 use function strtolower;
 
@@ -46,6 +47,10 @@ class EffectCommand extends VanillaCommand{
 			DefaultPermissionNames::COMMAND_EFFECT_SELF,
 			DefaultPermissionNames::COMMAND_EFFECT_OTHER
 		]);
+		$this->setArgument("player", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
+		$this->setArgument("effect", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
+		$this->setArgument("number", AvailableCommandsPacket::ARG_TYPE_INT, true);
+		$this->setArgument("number", AvailableCommandsPacket::ARG_TYPE_INT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

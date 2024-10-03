@@ -29,9 +29,14 @@ use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\network\mcpe\protocol\types\ParticleIds;
 
 class DustParticle implements Particle{
-	public function __construct(private Color $color){}
+    private int $cachedARGB;
 
-	public function encode(Vector3 $pos) : array{
-		return [LevelEventPacket::standardParticle(ParticleIds::DUST, $this->color->toARGB(), $pos)];
-	}
+    public function __construct(private readonly Color $color){
+        $this->cachedARGB = $this->color->toARGB();
+    }
+
+    public function encode(Vector3 $pos) : array{
+        return [LevelEventPacket::standardParticle(ParticleIds::DUST, $this->cachedARGB, $pos)];
+    }
 }
+

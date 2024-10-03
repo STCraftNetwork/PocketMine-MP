@@ -29,6 +29,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\lang\Translatable;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function array_chunk;
 use function array_pop;
 use function count;
@@ -52,6 +53,7 @@ class HelpCommand extends VanillaCommand{
 			["?"]
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_HELP);
+		$this->setArgument("page", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, true);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

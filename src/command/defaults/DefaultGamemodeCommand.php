@@ -29,6 +29,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\GameMode;
 use pocketmine\ServerProperties;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function count;
 
 class DefaultGamemodeCommand extends VanillaCommand{
@@ -40,6 +41,7 @@ class DefaultGamemodeCommand extends VanillaCommand{
 			KnownTranslationFactory::commands_defaultgamemode_usage()
 		);
 		$this->setPermission(DefaultPermissionNames::COMMAND_DEFAULTGAMEMODE);
+		$this->setArgument("gamemode", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, false);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){

@@ -1106,17 +1106,31 @@ class NetworkSession{
 			}
 
 			$description = $command->getDescription();
-			$data = new CommandData(
-				$lname, //TODO: commands containing uppercase letters in the name crash 1.9.0 client
-				$description instanceof Translatable ? $this->player->getLanguage()->translate($description) : $description,
-				0,
-				0,
-				$aliasObj,
-				[
-					new CommandOverload(chaining: false, parameters: [CommandParameter::standard("args", AvailableCommandsPacket::ARG_TYPE_RAWTEXT, 0, true)])
-				],
-				chainedSubCommandData: []
-			);
+			$overloads = [];
+			$parameter = [];
+			foreach($command->getArguments() as $arg) {
+    			$parameter = new CommandParameter(
+        		$arg['name'],
+        		$arg['type'] ?? AvailableCommandsPacket::ARG_TYPE_RAWTEXT,
+        		$arg['optional'] ?? 0 
+    		);
+    
+    		$overloads[] = new CommandOverload(
+        		chaining: false, 
+        		parameters: [$parameter] 
+    		);
+		}
+
+		$data = new CommandData(
+    		$lname, // TODO: commands containing uppercase letters in the name crash 1.9.0 client
+    		$description instanceof Translatable ? $this->player->getLanguage()->translate($description) : $description,
+    		0,
+    		0,
+   			$aliasObj,
+    		$overloads, 
+    		chainedSubCommandData: []
+		);
+
 
 			$commandData[$command->getLabel()] = $data;
 		}
