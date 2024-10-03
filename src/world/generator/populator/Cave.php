@@ -10,7 +10,7 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\world\ChunkManager;
 
-class Cave implements Populator {
+class Cave {
 	private float $density = 0.1;
 	private int $tunnelingFactor = 2;
 
