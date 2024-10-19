@@ -10,7 +10,7 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\world\ChunkManager;
 
-class Cave {
+class Cave implements Populator {
 	private float $density = 0.1;
 	private int $tunnelingFactor = 2;
 
@@ -40,7 +40,7 @@ class Cave {
 				for ($dz = -$caveSize; $dz <= $caveSize; ++$dz) {
 					if (abs($dx) + abs($dy) + abs($dz) <= $caveSize) {
 						$blockPos = new Vector3($start->x + $dx, $start->y + $dy, $start->z + $dz);
-						$world->setBlock($blockPos, VanillaBlocks::AIR());
+						$world->setBlockAt($blockPos->getX(), $blockPos->getY(), $blockPos->getZ(), VanillaBlocks::AIR());
 					}
 				}
 			}

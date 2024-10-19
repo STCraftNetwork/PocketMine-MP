@@ -9,7 +9,7 @@ use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\world\ChunkManager;
 
-class Tree {
+class Tree implements Populator {
 	private int $baseAmount = 1;
 	private int $randomAmount = 3;
 	public function setBaseAmount(int $baseAmount): void {
@@ -36,7 +36,10 @@ class Tree {
 	private function generateTree(ChunkManager $world, Vector3 $position): void {
 		// Generate trunk
 		for ($dy = 0; $dy < 5; ++$dy) {
-			$world->setBlock($position->add(0, $dy, 0), VanillaBlocks::OAK_LOG());
+			$x = $position->getX();
+			$y = (int)$position->getY() + $dy;
+			$z = $position->getZ();
+			$world->setBlockAt($x, $y, $z, VanillaBlocks::OAK_LOG());
 		}
 
 		$leafPositions = [
@@ -53,7 +56,7 @@ class Tree {
 		];
 
 		foreach ($leafPositions as $leafPos) {
-			$world->setBlock($leafPos, VanillaBlocks::OAK_LEAVES());
+			$world->setBlockAt($leafPos->getX(), $leafPos->getY(), $leafPos->getZ(), VanillaBlocks::OAK_LEAVES());
 		}
 	}
 

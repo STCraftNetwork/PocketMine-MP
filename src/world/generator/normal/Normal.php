@@ -127,9 +127,9 @@ class Normal extends Generator{
 			self::WORLD_MAX_HEIGHT - self::WORLD_MIN_HEIGHT,
 			Chunk::EDGE_LENGTH,
 			4, 8, 4,
-			$chunkX * Chunk::EDGE_LENGTH,
+			(int)($chunkX * Chunk::EDGE_LENGTH),
 			self::WORLD_MIN_HEIGHT,
-			$chunkZ * Chunk::EDGE_LENGTH
+			(int)($chunkZ * Chunk::EDGE_LENGTH)
 		);
 		$chunk = $world->getChunk($chunkX, $chunkZ) ?? throw new \InvalidArgumentException("Chunk $chunkX $chunkZ does not yet exist");
 		$biomeCache = [];
@@ -144,7 +144,7 @@ class Normal extends Generator{
 			$absoluteX = $baseX + $x;
 			for ($z = 0; $z < Chunk::EDGE_LENGTH; ++$z) {
 				$absoluteZ = $baseZ + $z;
-				$biome = $this->pickBiome($absoluteX, $absoluteZ);
+				$biome = $this->pickBiome((int)$absoluteX, (int)$absoluteZ);
 
 				for ($y = self::WORLD_MIN_HEIGHT; $y < self::WORLD_MAX_HEIGHT; $y++) {
 					$chunk->setBiomeId($x, $y, $z, $biome->getId());
@@ -159,8 +159,8 @@ class Normal extends Generator{
 						if ($sx === 0 && $sz === 0) {
 							$adjacent = $biome;
 						} else {
-							$index = World::chunkHash($absoluteX + $sx, $absoluteZ + $sz);
-							$adjacent = $biomeCache[$index] ??= $this->pickBiome($absoluteX + $sx, $absoluteZ + $sz);
+							$index = World::chunkHash((int)$absoluteX + $sx, (int)$absoluteZ + $sz);
+							$adjacent = $biomeCache[$index] ??= $this->pickBiome((int)$absoluteX + $sx, (int)$absoluteZ + $sz);
 						}
 						$minSum += ($adjacent->getMinElevation() - 1) * $weight;
 						$maxSum += $adjacent->getMaxElevation() * $weight;
