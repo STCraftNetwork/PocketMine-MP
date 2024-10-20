@@ -8,10 +8,17 @@ use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use pocketmine\world\ChunkManager;
+use pocketmine\world\generator\object\TreeType;
 
 class Tree implements Populator {
 	private int $baseAmount = 1;
 	private int $randomAmount = 3;
+
+	private ?TreeType $treeType; // unused rn.
+
+	public function __construct(?TreeType $var = TreeType::OAK()) {
+		$this->treeType = $var;
+	}
 	public function setBaseAmount(int $baseAmount): void {
 		$this->baseAmount = $baseAmount;
 	}

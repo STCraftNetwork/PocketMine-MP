@@ -47,8 +47,8 @@ class TallGrass implements Populator{
 
 		$block = VanillaBlocks::TALL_GRASS();
 		for($i = 0; $i < $amount; ++$i){
-			$x = $random->nextRange($chunkX * Chunk::EDGE_LENGTH, $chunkX * Chunk::EDGE_LENGTH + (Chunk::EDGE_LENGTH - 1));
-			$z = $random->nextRange($chunkZ * Chunk::EDGE_LENGTH, $chunkZ * Chunk::EDGE_LENGTH + (Chunk::EDGE_LENGTH - 1));
+			$x = $random->nextRange((int)($chunkX * Chunk::EDGE_LENGTH), (int)($chunkX * Chunk::EDGE_LENGTH + (Chunk::EDGE_LENGTH - 1)));
+			$z = $random->nextRange((int)($chunkZ * Chunk::EDGE_LENGTH), (int)($chunkZ * Chunk::EDGE_LENGTH + (Chunk::EDGE_LENGTH - 1)));
 			$y = $this->getHighestWorkableBlock($world, $x, $z);
 
 			if($y !== -1 && $this->canTallGrassStay($world, $x, $y, $z)){

@@ -33,6 +33,7 @@ use pocketmine\permission\PermissionManager;
 use pocketmine\Server;
 use pocketmine\utils\BroadcastLoggerForwarder;
 use pocketmine\utils\TextFormat;
+use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use function explode;
 use function implode;
 use function str_replace;
@@ -48,7 +49,7 @@ abstract class Command{
 	private array $aliases = [];
 
 	/**
-     * @var array<string, mixed> $arguments
+     * @var array<int|string, mixed> $arguments
      */
     protected array $arguments = [];
 
@@ -226,7 +227,7 @@ abstract class Command{
 		$this->usageMessage = $usage;
 	}
 
-	public function getArguments() {
+	public function getArguments(): array{
 		return $this->arguments;
 	}
 
