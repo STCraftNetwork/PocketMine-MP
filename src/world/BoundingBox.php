@@ -7,6 +7,7 @@ use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\StructureEditorData;
 use pocketmine\player\Player;
 use pocketmine\network\mcpe\protocol\types\StructureSettings;
+use pocketmine\network\mcpe\protocol\ClientboundPacket;
 
 class BoundingBox
 {
@@ -16,8 +17,6 @@ class BoundingBox
     private float $maxX;
     private float $maxY;
     private float $maxZ;
-
-    private int $uuid = 0;
 
     public function __construct(float $minX, float $minY, float $minZ, float $maxX, float $maxY, float $maxZ)
     {
@@ -62,18 +61,24 @@ class BoundingBox
     }
 
     private function sendStructureBlockUpdate(Player $player, BlockPosition $blockPosition, int $blockType): void
-    {
+{
+    $structureSettings = new StructureSettings();
+    $structureData = new StructureEditorData("ExampleName", "ExampleDataField", false, true, 0, $structureSettings, 0);
 
-        $StructureSettings = new StructureSettings();
-        $structureData = new StructureEditorData("ExampleName", "ExampleDataField", false, true, 0, $StructureSettings, 0);
+    $packet = StructureBlockUpdatePacket::create(
+        $blockPosition,
+        $structureData,
+        false,
+        false
+    );
 
-        $player->getNetworkSession()->sendDataPacket(StructureBlockUpdatePacket::create(
-            $blockPosition,
-            $structureData,
-            false,
-            false
-        ));
+    if ($packet instanceof ClientboundPacket) {
+        $player->getNetworkSession()->sendDataPacket($packet);
+    } else {
+        throw new \InvalidArgumentException("The created packet is not a valid ClientboundPacket.");
     }
+}
+
 
     public function clearBoundingBox(Player $player): void
     {

@@ -1417,14 +1417,11 @@ class NetworkSession
 	private function syncDirtyAttributes(): void
 	{
 		// this check is stupid and unneeded but here just cause otherwise pmmp error check is bitch.
-		if ($this->player !== null && $this->player instanceof Living) {
+		if ($this->player !== null) {
 			$dirtyAttributes = $this->player->getAttributeMap()->needSend();
-
-			if (is_array($dirtyAttributes)) { // I think this check also useless. but might save some butts if array isn't sent.
-				$this->entityEventBroadcaster->syncAttributes([$this], $this->player, $dirtyAttributes);
-				foreach ($dirtyAttributes as $attribute) {
-					$attribute->markSynchronized();
-				}
+			$this->entityEventBroadcaster->syncAttributes([$this], $this->player, $dirtyAttributes);
+			foreach ($dirtyAttributes as $attribute) {
+				$attribute->markSynchronized();
 			}
 		}
 	}
