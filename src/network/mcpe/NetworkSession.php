@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\network\mcpe;
 
 use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\Living;
 use pocketmine\event\player\PlayerDuplicateLoginEvent;
 use pocketmine\event\player\PlayerResourcePackOfferEvent;
 use pocketmine\event\server\DataPacketDecodeEvent;
@@ -1387,41 +1388,44 @@ class NetworkSession
 	}
 
 	public function tick(): void
-{
-    if (!$this->isConnected()) {
-        $this->dispose();
-        return;
-    }
+	{
+		if (!$this->isConnected()) {
+			$this->dispose();
+			return;
+		}
 
-    if ($this->info === null && time() >= $this->connectTime + 10) {
-        $this->disconnectWithError(KnownTranslationFactory::pocketmine_disconnect_error_loginTimeout());
-        return;
-    }
+		if ($this->info === null && time() >= $this->connectTime + 10) {
+			$this->disconnectWithError(KnownTranslationFactory::pocketmine_disconnect_error_loginTimeout());
+			return;
+		}
 
-    if ($this->player !== null) {
-        $this->player->doChunkRequests();
-        $this->syncDirtyAttributes();
-    }
+		if ($this->player !== null) {
+			$this->player->doChunkRequests();
+			$this->syncDirtyAttributes();
+		}
 
-    Timings::$playerNetworkSendInventorySync->startTiming();
-    try {
-        $this->invManager?->flushPendingUpdates();
-    } finally {
-        Timings::$playerNetworkSendInventorySync->stopTiming();
-    }
+		Timings::$playerNetworkSendInventorySync->startTiming();
+		try {
+			$this->invManager?->flushPendingUpdates();
+		} finally {
+			Timings::$playerNetworkSendInventorySync->stopTiming();
+		}
 
-    $this->flushSendBuffer();
-}
+		$this->flushSendBuffer();
+	}
 
-private function syncDirtyAttributes(): void
-{
-    $dirtyAttributes = $this->player->getAttributeMap()->needSend();
+	private function syncDirtyAttributes(): void
+	{
+		// this check is stupid and unneeded but here just cause otherwise pmmp error check is bitch.
+		if ($this->player !== null && $this->player instanceof Living) {
+			$dirtyAttributes = $this->player->getAttributeMap()->needSend();
 
-    if ($dirtyAttributes) {
-        $this->entityEventBroadcaster->syncAttributes([$this], $this->player, $dirtyAttributes);
-        foreach ($dirtyAttributes as $attribute) {
-            $attribute->markSynchronized();
-        }
-    }
-}
+			if (is_array($dirtyAttributes)) { // I think this check also useless. but might save some butts if array isn't sent.
+				$this->entityEventBroadcaster->syncAttributes([$this], $this->player, $dirtyAttributes);
+				foreach ($dirtyAttributes as $attribute) {
+					$attribute->markSynchronized();
+				}
+			}
+		}
+	}
 }
